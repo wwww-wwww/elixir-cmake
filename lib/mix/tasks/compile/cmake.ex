@@ -59,7 +59,6 @@ defmodule Mix.Tasks.Compile.Cmake do
   """
   use Mix.Task
 
-  @default_make_target "all"
   @default_working_dir "cmake"
   @recursive true
 
@@ -76,15 +75,12 @@ defmodule Mix.Tasks.Compile.Cmake do
     working_dir = working_dir(config)
     :ok = File.mkdir_p(working_dir)
 
-    make_targets =
-      (config[:make_targets] || [@default_make_target])
-
     cmake_lists =
       (config[:cmake_lists] || File.cwd!())
       |> Path.expand()
 
     cmd("cmake", [cmake_lists], working_dir, env)
-    cmd("make", make_targets, working_dir, env)
+    cmd("cmake", ["--build", ".", "-j"], working_dir, env)
 
     Mix.Project.build_structure()
 
