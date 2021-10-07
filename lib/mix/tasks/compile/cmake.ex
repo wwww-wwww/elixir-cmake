@@ -80,7 +80,7 @@ defmodule Mix.Tasks.Compile.Cmake do
       |> Path.expand()
 
     cmd("cmake", [cmake_lists], working_dir, env)
-    cmd("cmake", ["--build", ".", "-j"], working_dir, env)
+    cmd("cmake", ["--build", "."], working_dir, env)
 
     Mix.Project.build_structure()
 
@@ -100,13 +100,19 @@ defmodule Mix.Tasks.Compile.Cmake do
   end
 
   defp cmd(exec, args, dir, env \\ %{}) do
-    case System.cmd(exec, args, cd: dir, stderr_to_stdout: true, env: env) do
-      {result, 0} ->
-        Mix.shell().info(result)
+    opts = [
+      into: IO.stream(:stdio, :line),
+      stderr_to_stdout: true,
+      cd: dir,
+      env: env
+    ]
+
+    case System.cmd(exec, args, opts) do
+      {_, 0} ->
         :ok
 
       {result, status} ->
-        Mix.raise("Failure running '#{exec}' (status: #{status}).\n#{result}")
+        Mix.raise("Failure running '#{exec}' (status: #{status}).\n#{inspect(result)}")
     end
   end
 
