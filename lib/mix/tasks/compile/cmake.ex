@@ -156,6 +156,7 @@ defmodule Mix.Tasks.Compile.Cmake do
   defp working_dir(config) do
     config
     |> Mix.Project.build_path()
+    |> Path.join(config[:app] |> Atom.to_string())
     |> Path.join(@default_working_dir)
   end
 end
