@@ -79,8 +79,15 @@ defmodule Mix.Tasks.Compile.Cmake do
       (config[:cmake_lists] || File.cwd!())
       |> Path.expand()
 
+    flags =
+      if System.get_env("CMAKE_BUILDFLAGS") do
+        ["--", System.get_env("CMAKE_BUILDFLAGS")]
+      else
+        []
+      end
+
     cmd("cmake", [cmake_lists], working_dir, env)
-    cmd("cmake", ["--build", "."], working_dir, env)
+    cmd("cmake", ["--build", "."] ++ flags, working_dir, env)
 
     Mix.Project.build_structure()
 
